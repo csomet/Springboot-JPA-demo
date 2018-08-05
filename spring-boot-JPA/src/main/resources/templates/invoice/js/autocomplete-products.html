@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+	<script type="text/javascript" th:fragment="javascript">
+
+	$(document).ready(function(){
+	
+		$("#search_product").autocomplete({
+			
+			source: function(request, response){
+				$.ajax({
+					url: "/invoice/load-products/" + request.term,
+					dataType: "json",
+					data: {
+						term: request.term
+					},
+					success: function(data){
+						response($.map(data, function(item){
+							return {
+								value: item.id,
+								label: item.name,
+								price: item.price,
+							};
+						}));
+					},
+				});
+			},
+		
+			select:  function(event, ui){
+				//$("#search_product").val(ui.item.label);
+			
+				if(itemsHelper.hasProduct(ui.item.value)){
+					itemsHelper.increaseAmount(ui.item.value, ui.item.price)
+					return false;
+				}
+				var line = $("#invoiceDetailTemplate").html();
+				
+				line = line.replace(/{ID}/g, ui.item.value);
+				line = line.replace(/{name}/g, ui.item.label);
+				line = line.replace(/{price}/g, ui.item.price);
+				
+				$("#loadInvoiceDetail tbody").append(line);
+				itemsHelper.calcTotal(ui.item.value, ui.item.price, 1);
+				
+				return false;
+				
+			}
+		
+		});
+		
+		$("form").submit(function(){
+			
+			$("#invoiceDetailTemplate").remove();
+			return;
+		});
+		
+	});
+	
+	
+	var itemsHelper = {
+			
+			calcTotal : function(id, price, amount){
+				$("#total_" + id).html(parseFloat(price) * parseFloat(amount));
+				this.grandTotalSum();
+			}, 
+			
+			hasProduct : function(id){
+				
+				var result = false;	
+				
+				$('input[name="item_id[]"]').each(function(){
+	
+					if (parseInt(id) == parseInt($(this).val()) ){
+						result = true;
+					}
+				
+				});
+				
+				return result;
+			}, 
+			
+			increaseAmount: function(id, price){
+				var amount = $("#amount_" + id).val() ? parseInt($("#amount_" + id).val()) : 0;
+				$("#amount_" + id).val(++amount);
+				this.calcTotal(id, price, amount);
+			},
+			
+			deleteInvoiceDetail: function(id){
+				$("#row_" + id).remove();
+				this.grandTotalSum();
+			}, 
+			
+			grandTotalSum: function(){
+				
+				var total = 0;
+				
+				$('span[id^="total_"]').each(function(){
+					
+					total = total + parseInt($(this).html());
+					
+				});   
+				
+				$("#grand_total").html(total);
+			}
+	}
+	
+	</script>
+
+</body>
+</html>

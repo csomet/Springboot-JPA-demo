@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+	<nav th:fragment="paginator">
+		<ul class="pagination">
+			<li class="page-item"
+				th:class="${page.FirstPage? 'page-item disabled' : 'page-item'}">
+
+				<a class="page-link" th:href="@{${page.url}(page=0)}" th:text="#{text.pagination.first}">First</a>
+			</li>
+
+			<li class="page-item"
+				th:class="${not page.hasPrevPage? 'page-item disabled' : 'page-item'}">
+				<a class="page-link"
+				th:href="@{${page.url}(page=${page.activePage - 2})}" th:utext="#{text.pagination.next}">&laquo;</a>
+
+			</li>
+
+			<li class="page-item"
+				th:class="${item.Active ? 'page-item active' : 'page-item'}"
+				th:each="item : ${page.pages}"><a class="page-link"
+				th:href="@{${page.url}(page=${item.numPage - 1})}"
+				th:text="${item.numPage}"></a></li>
+
+			<li class="page-item"
+				th:class="${not page.hasNextPage? 'page-item disabled' : 'page-item'}">
+				<a class="page-link"
+				th:href="@{${page.url}(page=${page.activePage})}" th:utext="#{text.pagination.prev}">&raquo;</a>
+
+			</li>
+
+			<li class="page-item"
+				th:class="${page.LastPage? 'page-item disabled' : 'page-item'}">
+				<a class="page-link"
+				th:href="@{${page.url}(page=${page.TotalPages - 1})}" th:text="#{text.pagination.last}">Last</a>
+
+			</li>
+
+		</ul>
+
+	</nav>
+</body>
+</html>
