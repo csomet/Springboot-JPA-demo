@@ -1,4 +1,4 @@
-# Springboot JPA Demo webapp
+# Springboot JPA Demo
 
 **Demo webapp with users logging and roles** under MySQL database. XML/JSON Rest services.
 non-commercial purpose.
